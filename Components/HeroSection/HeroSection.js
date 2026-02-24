@@ -22,7 +22,6 @@ const MARQUEE_ITEMS = [
   "NODE.JS",
   "MONGODB",
   "EXPRESS",
-  "WEB APPS",
   "UI/UX",
 ];
 
@@ -275,7 +274,7 @@ export default function HeroSection() {
     // Parallax on scroll
     if (containerRef.current) {
       gsap.to(containerRef.current.querySelector(".hero-parallax"), {
-        y: -80,
+        y: -300,
         ease: "none",
         scrollTrigger: {
           trigger: containerRef.current,
@@ -295,7 +294,7 @@ export default function HeroSection() {
       style={{ background: "var(--bg-primary)" }}
     >
       {/* Grid overlay */}
-      <div className="absolute inset-0 bg-grid-dark opacity-100 pointer-events-none z-0" />
+      {/* <div className="absolute inset-0 bg-grid-dark opacity-100 pointer-events-none z-0" /> */}
 
       {/* Background radial glow */}
       <div
@@ -320,7 +319,7 @@ export default function HeroSection() {
         <DotGrid
           dotSize={5}
           gap={30}
-          baseColor="#2a2a2a"
+          baseColor="#1a1a1a"
           activeColor="#ff6b35"
           proximity={160}
           shockRadius={200}
@@ -331,7 +330,7 @@ export default function HeroSection() {
       </div>
 
       {/* Scrolling marquee background text */}
-      <div className="absolute top-[10%] left-0 w-full overflow-hidden whitespace-nowrap pointer-events-none z-0 select-none opacity-[0.03]">
+      <div className="absolute top-[10%] left-0 w-full overflow-hidden whitespace-nowrap pointer-events-none z-0 select-none opacity-[0.02]">
         <div
           className="flex gap-16 animate-marquee"
           style={{ width: "max-content" }}
@@ -358,132 +357,6 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Left telemetry card */}
-      <div
-        ref={leftCardRef}
-        className="absolute left-6 top-1/2 -translate-y-1/2 hidden xl:flex flex-col gap-5 z-20 opacity-0"
-        style={{ width: "240px" }}
-      >
-        {/* Location card */}
-        <div className=" rounded-xl p-5 relative overflow-hidden">
-          <div className="scan-line" />
-          <div className="flex justify-between items-start mb-4">
-            <span
-              className="font-mono-label"
-              style={{
-                fontSize: "10px",
-                fontWeight: 500,
-                color: "rgba(255,255,255,0.35)",
-              }}
-            >
-              SYS / ACTIVE
-            </span>
-            <div className="flex gap-1">
-              <div
-                className="w-1.5 h-1.5 rounded-full animate-pulse-orange"
-                style={{ background: "var(--orange)" }}
-              />
-              <div
-                className="w-1.5 h-1.5 rounded-full"
-                style={{ background: "rgba(255,107,53,0.2)" }}
-              />
-            </div>
-          </div>
-          <div className="flex items-center gap-2 text-white mb-1">
-            <MapPin size={15} style={{ color: "var(--orange)" }} />
-            <span className="font-display text-sm text-white">Lahore, PK</span>
-          </div>
-          <div
-            className="font-mono-label ml-6"
-            style={{
-              fontSize: "10px",
-              fontWeight: 400,
-              color: "rgba(255,255,255,0.32)",
-            }}
-          >
-            {time}
-          </div>
-        </div>
-
-        {/* Availability */}
-        <div className="cyber-card rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div
-              className="w-2 h-2 rounded-full animate-pulse"
-              style={{ background: "#22c55e", boxShadow: "0 0 8px #22c55e" }}
-            />
-            <span
-              className="font-mono-label"
-              style={{
-                fontSize: "10px",
-                fontWeight: 500,
-                color: "rgba(255,255,255,0.55)",
-              }}
-            >
-              AVAILABLE FOR WORK
-            </span>
-          </div>
-          <div className="space-y-2">
-            <div
-              className="flex items-center gap-2"
-              style={{ color: "rgba(255,255,255,0.38)" }}
-            >
-              <Code2 size={11} />
-              <span
-                className="font-mono-label"
-                style={{ fontSize: "10px", fontWeight: 500 }}
-              >
-                FREELANCE OPEN
-              </span>
-            </div>
-            <div
-              className="flex items-center gap-2"
-              style={{ color: "rgba(255,255,255,0.38)" }}
-            >
-              <Layers size={11} />
-              <span
-                className="font-mono-label"
-                style={{ fontSize: "10px", fontWeight: 500 }}
-              >
-                FULLTIME OPEN
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Personal image micro-card */}
-        <div
-          className="cyber-card bg-black rounded-xl overflow-hidden relative group"
-          style={{ height: "150px" }}
-        >
-          <img
-            src="/Images/my_image1.jpeg"
-            alt="Muneeb U Rehman"
-            className="w-full h-full object-cover object-right-top grayscale group-hover:grayscale-0 transition-all duration-700"
-          />
-
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(0deg, rgba(8,8,8,0.75) 0%, transparent 50%)",
-            }}
-          />
-
-          <div className="absolute bottom-2 left-3">
-            <span
-              className="font-mono-label"
-              style={{
-                fontSize: "9px",
-                fontWeight: 500,
-                color: "var(--orange)",
-              }}
-            >
-              MUNEEB U REHMAN
-            </span>
-          </div>
-        </div>
-      </div>
 
       {/* Right telemetry card */}
       <div

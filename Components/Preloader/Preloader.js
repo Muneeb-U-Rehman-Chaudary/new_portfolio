@@ -1,192 +1,221 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Press_Start_2P } from 'next/font/google';
-import gsap from 'gsap';
+import { useEffect, useRef, useState } from 'react';
+import { Poppins } from 'next/font/google';
 
-const pressStart2P = Press_Start_2P({
+const poppins = Poppins({
   subsets: ['latin'],
-  weight: '400',
-  variable: '--font-press-start-2p',
+  weight: '900',
+  variable: '--font-poppins-pre',
 });
+
+// SVG canvas — wide enough for M.R.C at 500px, tall enough with padding
+const VW = 1600;
+const VH = 580;
+
+function buildWave(yBase, amplitude = 18, segments = 8) {
+  const segW = VW / segments;
+  let d = `M0 ${yBase}`;
+  for (let i = 0; i < segments * 2; i++) {
+    const sign = i % 2 === 0 ? -1 : 1;
+    const cx1 = i * segW + segW * 0.25;
+    const cy1 = yBase + sign * amplitude;
+    const cx2 = i * segW + segW * 0.75;
+    const cy2 = yBase + sign * amplitude;
+    const ex  = (i + 1) * segW;
+    d += ` C${cx1} ${cy1}, ${cx2} ${cy2}, ${ex} ${yBase}`;
+  }
+  d += ` V${VH} H0 Z`;
+  return d;
+}
 
 export default function Preloader() {
   const [progress, setProgress] = useState(0);
+  const [done,     setDone]     = useState(false);
+  const frontRef     = useRef(null);
+  const backRef      = useRef(null);
+  const rafRef       = useRef(null);
+  const preloaderRef = useRef(null);
+
+  // Map progress 0–100 → yBase VH+50 → -50
+  const yAt = (pct) => VH + 50 - (pct / 100) * (VH + 100);
 
   useEffect(() => {
-    const tl = gsap.timeline();
+    // Horizontal wave drift
+    let x = 0;
+    const drift = () => {
+      x = (x - 0.6) % VW;
+      const g = document.getElementById('pre-wave-g');
+      if (g) g.setAttribute('transform', `translate(${x}, 0)`);
+      rafRef.current = requestAnimationFrame(drift);
+    };
+    rafRef.current = requestAnimationFrame(drift);
 
-    // Fade in the logo
-    tl.fromTo(
-      '#preloader-logo',
-      { opacity: 0, scale: 0.95 },
-      { opacity: 1, scale: 1, duration: 0.8, ease: 'power2.out' }
-    );
-
-    // Animate the fill wave
-    tl.to('#wave', {
-      y: 250,
-      scaleY: 7.5,
-      transformOrigin: 'center bottom',
-      duration: 3,
-      ease: 'power2.inOut',
-    }, 0.3);
-
-    // Animate glitch lines
-    tl.fromTo(
-      '.glitch-line',
-      { scaleX: 0, opacity: 0 },
-      { scaleX: 1, opacity: 1, stagger: 0.15, duration: 0.3, ease: 'power2.out' },
-      0.2
-    );
-
+    // Progress counter — ~6s total (60ms × 100)
     let count = 0;
     const interval = setInterval(() => {
       if (count >= 100) {
         clearInterval(interval);
         setTimeout(() => {
-          gsap.to('#preloader', {
-            opacity: 0,
-            duration: 0.8,
-            ease: 'power2.out',
-            onComplete: () => {
-              const el = document.getElementById('preloader');
-              if (el) el.style.display = 'none';
-            },
-          });
+          setDone(true);
+          setTimeout(() => {
+            const el = preloaderRef.current;
+            if (el) el.style.display = 'none';
+          }, 800);
         }, 400);
       } else {
         count += 1;
         setProgress(count);
+        const y = yAt(count);
+        if (frontRef.current) frontRef.current.setAttribute('d', buildWave(y, 18));
+        if (backRef.current)  backRef.current.setAttribute('d', buildWave(y + 16, 12));
       }
-    }, 28);
+    }, 60);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      cancelAnimationFrame(rafRef.current);
+    };
   }, []);
+
+  const y0 = yAt(0);
+
+  const fontFamily = `${poppins.style.fontFamily}, 'Poppins', sans-serif`;
 
   return (
     <div
+      ref={preloaderRef}
       id="preloader"
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
-      style={{ background: '#050505' }}
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
+      style={{
+        background: '#080808',
+        opacity: done ? 0 : 1,
+        transition: 'opacity 0.8s ease',
+        pointerEvents: done ? 'none' : 'auto',
+      }}
     >
-      {/* Grid overlay */}
+      {/* Vignette */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-30"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage:
-            'linear-gradient(rgba(255,107,53,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,107,53,0.04) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
+          background:
+            'radial-gradient(ellipse 75% 65% at 50% 50%, transparent 35%, rgba(0,0,0,0.6) 100%)',
         }}
       />
 
-      {/* Glitch lines */}
-      {[0, 1, 2].map((i) => (
-        <div
-          key={i}
-          className="glitch-line absolute left-0 h-[1px] w-full pointer-events-none"
-          style={{
-            top: `${25 + i * 25}%`,
-            background: `linear-gradient(90deg, transparent, rgba(255,107,53,${0.15 - i * 0.04}), transparent)`,
-            opacity: 0,
-            transformOrigin: 'left center',
-          }}
-        />
-      ))}
-
-      {/* Logo SVG */}
-      <div id="preloader-logo" className="w-full max-w-[700px] px-8 opacity-0">
+      {/* SVG — responsive: fills viewport width on mobile, capped on desktop */}
+      <div style={{ width: 'min(95vw, 1100px)', padding: '0', position: 'relative', zIndex: 1 }}>
         <svg
+          viewBox={`0 0 ${VW} ${VH}`}
           width="100%"
-          viewBox="0 0 1000 280"
           xmlns="http://www.w3.org/2000/svg"
+          style={{ overflow: 'visible' }}
         >
           <defs>
-            <clipPath id="text-clip-pre">
+            <clipPath id="pre-clip">
               <text
                 x="50%"
-                y="55%"
-                dominantBaseline="middle"
+                y="52%"
                 textAnchor="middle"
-                fontSize="170"
-                letterSpacing="15"
-                fontFamily={pressStart2P.style.fontFamily}
+                dominantBaseline="middle"
+                fontSize="500"
+                fontFamily={fontFamily}
+                fontWeight="900"
+                letterSpacing="-10"
               >
                 M.R.C
               </text>
             </clipPath>
           </defs>
 
-          {/* Outline text */}
+          {/* Ghost outline */}
           <text
             x="50%"
-            y="55%"
-            dominantBaseline="middle"
+            y="52%"
             textAnchor="middle"
-            fontSize="170"
+            dominantBaseline="middle"
+            fontSize="500"
+            fontFamily={fontFamily}
+            fontWeight="900"
+            letterSpacing="-10"
             fill="none"
-            stroke="rgba(255,255,255,0.08)"
+            stroke="rgba(255,255,255,0.06)"
             strokeWidth="1"
-            letterSpacing="15"
-            fontFamily={pressStart2P.style.fontFamily}
           >
             M.R.C
           </text>
 
-          {/* Fill wave inside text */}
-          <g clipPath="url(#text-clip-pre)">
-            <rect width="100%" height="100%" fill="#0d0d0d" />
-            <path
-              id="wave"
-              d="M0 240 Q 125 195, 250 240 T 500 240 T 750 240 T 1000 240 V280 H0 Z"
-              fill="var(--orange, #ff6b35)"
-              opacity="0.9"
-            />
+          {/* Liquid fill clipped to text */}
+          <g clipPath="url(#pre-clip)">
+            <rect width={VW} height={VH} fill="#0d0d0d" />
+            <g id="pre-wave-g">
+              {/* Back wave — dimmer */}
+              <path ref={backRef}  d={buildWave(y0 + 16, 12)} fill="rgba(255,107,53,0.28)" />
+              {/* Front wave */}
+              <path ref={frontRef} d={buildWave(y0, 18)}      fill="#ff6b35" opacity="0.9" />
+              {/* Tiles for seamless scroll */}
+              <path d={buildWave(y0 + 16, 12)} fill="rgba(255,107,53,0.28)" transform={`translate(${VW},0)`} />
+              <path d={buildWave(y0, 18)}      fill="#ff6b35" opacity="0.9"  transform={`translate(${VW},0)`} />
+            </g>
           </g>
+
+          {/* Crisp outline on top */}
+          <text
+            x="50%"
+            y="52%"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fontSize="500"
+            fontFamily={fontFamily}
+            fontWeight="900"
+            letterSpacing="-10"
+            fill="none"
+            stroke="rgba(255,255,255,0.1)"
+            strokeWidth="0.8"
+            style={{ pointerEvents: 'none' }}
+          >
+            M.R.C
+          </text>
         </svg>
       </div>
 
       {/* Progress bar */}
-      <div className="w-full max-w-[700px] px-8 mt-6">
-        <div className="flex justify-between mb-2">
-          <span
-            className="font-mono-label text-[10px]"
-            style={{ color: 'var(--orange)' }}
-          >
-            LOADING...
+      <div style={{ width: 'min(95vw, 1100px)', padding: '12px 0 0', position: 'relative', zIndex: 1 }}>
+        <div style={{
+          width: '100%',
+          height: 1,
+          background: 'rgba(255,255,255,0.05)',
+          borderRadius: 1,
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            height: '100%',
+            width: `${progress}%`,
+            background: '#ff6b35',
+            transition: 'width 65ms linear',
+            boxShadow: '0 0 10px rgba(255,107,53,0.5)',
+          }} />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10 }}>
+          <span style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: 9,
+            letterSpacing: '0.22em',
+            color: 'rgba(255,255,255,0.16)',
+            fontWeight: 500,
+          }}>
+            LOADING
           </span>
-          <span
-            className="font-mono-label text-[10px]"
-            style={{ color: 'rgba(255,255,255,0.4)' }}
-          >
+          <span style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: 9,
+            letterSpacing: '0.14em',
+            color: 'rgba(255,107,53,0.6)',
+            fontWeight: 600,
+          }}>
             {progress}%
           </span>
         </div>
-        <div
-          className="w-full h-[2px] rounded-full overflow-hidden"
-          style={{ background: 'rgba(255,255,255,0.06)' }}
-        >
-          <div
-            className="h-full rounded-full transition-all duration-75"
-            style={{
-              width: `${progress}%`,
-              background: 'var(--orange)',
-              boxShadow: '0 0 10px rgba(255,107,53,0.5)',
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Bottom status */}
-      <div
-        className="absolute bottom-8 flex items-center gap-3 font-mono-label text-[9px]"
-        style={{ color: 'rgba(255,255,255,0.2)' }}
-      >
-        <div
-          className="w-1 h-1 rounded-full animate-pulse"
-          style={{ background: 'var(--orange)' }}
-        />
-        INITIALIZING SYSTEMS
       </div>
     </div>
   );

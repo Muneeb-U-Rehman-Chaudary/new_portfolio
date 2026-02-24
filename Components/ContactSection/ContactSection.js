@@ -311,7 +311,7 @@ export default function ContactSection() {
                   className="font-mono-label"
                   style={{ fontSize: '10px', fontWeight: 500, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}
                 >
-                  +92 318 6044351
+                  +92 323 8691626
                 </span>
               </div>
               <div className="flex items-center gap-3">

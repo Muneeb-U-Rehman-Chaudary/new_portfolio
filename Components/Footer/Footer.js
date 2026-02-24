@@ -4,6 +4,8 @@ import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Link as ScrollLink } from 'react-scroll';
 import { FaGithub, FaLinkedin, FaInstagram } from 'react-icons/fa';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const navLinks = [
   { name: 'Home', href: 'home' },
@@ -11,7 +13,34 @@ const navLinks = [
   { name: 'Projects', href: 'project' },
   { name: 'Contact', href: 'contact' },
 ];
+function MagneticLink({ children, className, style, ...props }) {
+  const ref = useRef(null);
 
+  const handleMouseMove = (e) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    gsap.to(el, { x: x * 0.35, y: y * 0.35, duration: 0.3, ease: 'power2.out' });
+  };
+
+  const handleMouseLeave = () => {
+    gsap.to(ref.current, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.5)' });
+  };
+
+  return (
+    <span
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={className}
+      style={{ display: 'inline-block', ...style }}
+    >
+      {children}
+    </span>
+  );
+}
 const socialLinks = [
   { icon: <FaGithub size={15} />, href: 'https://github.com/Muneeb-U-Rehman-Chaudary', label: 'GitHub' },
   { icon: <FaLinkedin size={15} />, href: 'https://www.linkedin.com/in/muneeb-u-rehman-a0151a31a', label: 'LinkedIn' },
@@ -37,10 +66,11 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           {/* Logo */}
-          <span className="font-display text-xl text-white tracking-[0.1em]">
-            M<span style={{ color: 'var(--orange)' }}>.</span>R
-            <span style={{ color: 'var(--orange)' }}>.</span>C
-          </span>
+           <MagneticLink>
+              <Link href="/">
+                <Image src={"/Images/logo.png"} width={35} height={35} alt="Logo" />
+              </Link>
+            </MagneticLink>
 
           {/* Nav links */}
           <div className="flex items-center gap-6 md:gap-10">
