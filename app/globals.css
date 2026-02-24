@@ -1,0 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==================== DESIGN TOKENS ==================== */
+@layer base {
+  :root {
+    --background: 0 0% 3.1%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 20 100% 57%;
+    --primary-foreground: 0 0% 5%;
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 0 0% 80%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 20 100% 57%;
+    --accent-foreground: 0 0% 5%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
+    --ring: 20 100% 57%;
+    --radius: 0.5rem;
+
+    /* Custom cyber tokens */
+    --orange: #ff6b35;
+    --orange-dim: #ff6b3533;
+    --orange-glow: rgba(255, 107, 53, 0.15);
+    --bg-primary: #080808;
+    --bg-card: #0d0d0d;
+    --bg-card-hover: #111111;
+    --border-color: #1e1e1e;
+    --border-accent: rgba(255, 107, 53, 0.3);
+    --text-dim: rgba(255,255,255,0.35);
+    --text-muted: rgba(255,255,255,0.55);
+  }
+}
+
+/* ==================== BASE STYLES ==================== */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: rgba(255,255,255,0.88);
+    font-family: var(--font-poppins), 'Space Grotesk', sans-serif;
+    font-weight: 400;
+    line-height: 1.65;
+    cursor: none;
+  }
+
+  /* Hide default scrollbar — keep Firefox minimal */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #080808; }
+  ::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 2px; }
+}
+
+/* ==================== TYPOGRAPHY ==================== */
+.font-display {
+  font-family: var(--font-poppins), 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 0.88;
+}
+
+.font-mono-label {
+  font-family: 'JetBrains Mono', 'Geist Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.38);
+}
+
+.text-hero {
+  font-size: clamp(3.5rem, 11vw, 11rem);
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.text-ghost {
+  font-size: clamp(6rem, 22vw, 26rem);
+  color: rgba(255,255,255,0.03);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  font-weight: 900;
+}
+
+.text-stroke-orange {
+  -webkit-text-stroke: 1px var(--orange);
+  color: transparent;
+}
+
+.text-stroke-white {
+  -webkit-text-stroke: 1px rgba(255,255,255,0.15);
+  color: transparent;
+}
+
+/* ==================== VISUAL EFFECTS ==================== */
+.grainy-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.scan-line {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--orange), transparent);
+  opacity: 0;
+  top: 0;
+  left: 0;
+  animation: scan 2.5s linear infinite;
+  pointer-events: none;
+}
+
+.group:hover .scan-line {
+  opacity: 0.6;
+}
+
+/* Orange glow effect */
+.orange-glow {
+  box-shadow: 0 0 20px var(--orange-glow), 0 0 60px rgba(255,107,53,0.05);
+}
+
+.orange-glow-text {
+  text-shadow: 0 0 30px rgba(255,107,53,0.5);
+}
+
+/* Grid background */
+.bg-grid-dark {
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+}
+
+/* Cyber card */
+.cyber-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  transition: all 0.4s ease;
+}
+
+.cyber-card:hover {
+  border-color: var(--border-accent);
+  box-shadow: 0 0 30px rgba(255,107,53,0.06);
+}
+
+/* Active nav link */
+.active-link {
+  color: var(--orange);
+}
+
+.active-link::after {
+  width: 100%;
+}
+
+/* No scrollbar */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ==================== KEYFRAMES ==================== */
+@keyframes scan {
+  0% { transform: translateY(-100%); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(1000%); opacity: 0; }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-reverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-orange {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,53,0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(255,107,53,0); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes drawLine {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* ==================== UTILITY CLASSES ==================== */
+@layer utilities {
+  .animate-marquee { animation: marquee 60s linear infinite; }
+  .animate-marquee-reverse { animation: marquee-reverse 60s linear infinite; }
+  .animate-float { animation: float 6s ease-in-out infinite; }
+  .animate-spin-slow { animation: spin-slow 12s linear infinite; }
+  .animate-pulse-orange { animation: pulse-orange 2s ease-in-out infinite; }
+  .animate-scan { animation: scan 2.5s linear infinite; }
+
+  .text-orange { color: var(--orange); }
+  .bg-orange { background-color: var(--orange); }
+  .border-orange { border-color: var(--orange); }
+}
+
