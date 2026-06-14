@@ -742,25 +742,7 @@ export default function HeroSection() {
                 </div>
 
                 {/* CTA card */}
-                <ScrollLink to="contact" smooth duration={500} offset={-80}>
-                  <Magnetic>
-                    <div
-                      className="rounded-xl p-4 flex items-center justify-center gap-2 cursor-pointer group transition-all duration-300 hover:scale-[1.04] hover:shadow-[0_0_40px_rgba(255,107,53,0.3)]"
-                      style={{
-                        background: "var(--orange)",
-                        boxShadow: "0 0 35px rgba(255,107,53,0.22)",
-                      }}
-                    >
-                      <span className="font-display text-[11px] text-[#080808] tracking-widest">
-                        LET'S WORK
-                      </span>
-                      <ArrowUpRight
-                        size={14}
-                        className="text-[#080808] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
-                      />
-                    </div>
-                  </Magnetic>
-                </ScrollLink>
+               
               </div>
             </div>
           </div>
