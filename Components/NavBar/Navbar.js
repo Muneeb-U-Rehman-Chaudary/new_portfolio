@@ -153,7 +153,6 @@ export default function Navbar() {
                     color: 'rgba(255,255,255,0.45)',
                   }}
                 >
-                  <span className="mr-1.5" style={{ color: 'var(--orange)', opacity: 0.8 }}>0{i + 1}.</span>
                   <span className="group-hover:text-white transition-colors duration-200">
                     {link.name.toUpperCase()}
                   </span>
@@ -169,16 +168,8 @@ export default function Navbar() {
           {/* Desktop Right: Clock + Resume */}
           <div ref={rightRef} className="hidden md:flex items-center gap-6 opacity-0">
             <div className="flex items-center gap-2">
-              <div
-                className="w-1.5 h-1.5 rounded-full animate-pulse"
-                style={{ background: 'var(--orange)', boxShadow: '0 0 8px var(--orange)' }}
-              />
-              <span
-                className="font-mono-label"
-                style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.22em' }}
-              >
-                {time}
-              </span>
+             
+            
             </div>
 
             <MagneticLink>

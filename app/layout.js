@@ -169,7 +169,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={`${poppins.variable} ${inter.variable} ${spaceGrotesk.variable} antialiased`}>
         <ClientWrapper>
-          <SmoothCursor />
+          {/* <SmoothCursor /> */}
           <Preloader />
           {children}
         </ClientWrapper>
